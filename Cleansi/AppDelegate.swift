@@ -13,22 +13,22 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     @AppStorage("spotifyEnabled") private var spotifyEnabled = true
     @AppStorage("instagramEnabled") private var instagramEnabled = true
     @AppStorage("monitoringEnabled") private var monitoringEnabled = true
-    
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
         setupClipboardMonitor()
     }
-    
+
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        
+
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: Self.appName)
         }
-        
+
         updateMenu()
     }
-    
+
     private func updateMenu() {
         let menu = NSMenu()
 
@@ -72,7 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         statusItem.menu = menu
     }
-    
+
     private func setupClipboardMonitor() {
         clipboardMonitor = ClipboardMonitor(
             isEnabled: { [weak self] in self?.monitoringEnabled ?? false },
@@ -86,19 +86,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         )
         clipboardMonitor.startMonitoring()
     }
-    
+
     private func showNotification() {
         if let button = statusItem.button {
             // Flash the icon to indicate cleaning occurred
             let originalImage = button.image
             button.image = NSImage(systemSymbolName: "checkmark.circle.fill", accessibilityDescription: "Cleaned")
-            
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 button.image = originalImage
             }
         }
     }
-    
+
     @objc private func toggleMonitoring() {
         monitoringEnabled.toggle()
         updateMenu()
