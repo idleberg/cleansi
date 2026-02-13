@@ -18,8 +18,6 @@ opt_in_rules:
   - explicit_init
   - fatal_error_message
   - first_where
-  - force_unwrapping
-  - implicitly_unwrapped_optional
   - joined_default_parameter
   - overridden_super_call
   - redundant_nil_coalescing
@@ -34,16 +32,6 @@ disabled_rules:
   - line_length  # We use 120 char ruler but don't enforce
   - trailing_whitespace  # Can be noisy
   - todo  # Allow TODO comments
-
-# Rule configurations
-indentation:
-  severity: warning
-  indentation_width: 2
-  include_comments: false
-  include_compiler_directives: false
-  include_multiline_strings: false
-  indent_switch_case: true
-  indent_switch_case_from_colon: false
 
 identifier_name:
   min_length:
