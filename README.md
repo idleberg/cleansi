@@ -1,6 +1,6 @@
 # Cleansi for macOS
 
-> [!IMPORT]
+> [!IMPORTANT]
 >
 > This project is 100% vibe-coded, use at your own risk.
 
