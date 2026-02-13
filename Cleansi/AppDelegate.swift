@@ -34,7 +34,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         // Main toggle
         let monitoringItem = NSMenuItem(
-            title: monitoringEnabled ? "✓ Monitoring Active" : "○ Monitoring Paused",
+            title: monitoringEnabled ? "✓ Filtering Enabled" : "○ Filtering Disabled",
             action: #selector(toggleMonitoring),
             keyEquivalent: "m"
         )
