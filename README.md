@@ -355,7 +355,7 @@ To share the app with others, you need an Apple Developer account ($99/year):
 
 ### Clipboard not being monitored
 
-- Make sure "Monitoring Active" is checked in the menu
+- Make sure "Filtering Enabled" is checked in the menu
 - Check that the individual services (YouTube, Spotify, Instagram) are enabled
 
 ---
