@@ -12,6 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     @AppStorage("youtubeEnabled") private var youtubeEnabled = true
     @AppStorage("spotifyEnabled") private var spotifyEnabled = true
     @AppStorage("instagramEnabled") private var instagramEnabled = true
+    @AppStorage("amazonEnabled") private var amazonEnabled = true
     @AppStorage("monitoringEnabled") private var monitoringEnabled = true
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -79,6 +80,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             youtubeEnabled: { [weak self] in self?.youtubeEnabled ?? true },
             spotifyEnabled: { [weak self] in self?.spotifyEnabled ?? true },
             instagramEnabled: { [weak self] in self?.instagramEnabled ?? true },
+            amazonEnabled: { [weak self] in self?.amazonEnabled ?? true },
             onClean: { [weak self] in
                 self?.updateMenu()
                 self?.showNotification()

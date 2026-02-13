@@ -4,6 +4,14 @@ struct Service {
     let id: String
     let hosts: Set<String>
     let trackingParams: Set<String>
+    let removeAllParams: Bool
+
+    init(id: String, hosts: Set<String>, trackingParams: Set<String> = [], removeAllParams: Bool = false) {
+        self.id = id
+        self.hosts = hosts
+        self.trackingParams = trackingParams
+        self.removeAllParams = removeAllParams
+    }
 
     func matches(host: String) -> Bool {
         hosts.contains { host == $0 || host.hasSuffix(".\($0)") }
@@ -35,6 +43,16 @@ class ClipboardMonitor {
             id: "instagram",
             hosts: ["instagram.com"],
             trackingParams: ["igsh", "igshid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]
+        ),
+        Service(
+            id: "amazon",
+            hosts: [
+                "amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.it", "amazon.es",
+                "amazon.ca", "amazon.com.au", "amazon.co.jp", "amazon.in", "amazon.com.br",
+                "amazon.com.mx", "amazon.nl", "amazon.pl", "amazon.se", "amazon.sg",
+                "amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn"
+            ],
+            removeAllParams: true
         )
     ]
 
@@ -48,6 +66,7 @@ class ClipboardMonitor {
         youtubeEnabled: @escaping () -> Bool,
         spotifyEnabled: @escaping () -> Bool,
         instagramEnabled: @escaping () -> Bool,
+        amazonEnabled: @escaping () -> Bool,
         onClean: @escaping () -> Void
     ) {
         self.isEnabled = isEnabled
@@ -59,7 +78,8 @@ class ClipboardMonitor {
         let enabledMap: [String: () -> Bool] = [
             "youtube": youtubeEnabled,
             "spotify": spotifyEnabled,
-            "instagram": instagramEnabled
+            "instagram": instagramEnabled,
+            "amazon": amazonEnabled
         ]
         self.serviceEnabled = { enabledMap[$0]?() ?? false }
     }
@@ -114,7 +134,7 @@ class ClipboardMonitor {
                   serviceEnabled(service.id) else { continue }
 
             // Clean the URL
-            if let cleaned = cleanURL(url, removing: service.trackingParams) {
+            if let cleaned = cleanURL(url, service: service) {
                 result.replaceSubrange(matchRange, with: cleaned)
             }
         }
@@ -122,14 +142,19 @@ class ClipboardMonitor {
         return result
     }
 
-    private func cleanURL(_ url: URL, removing trackingParams: Set<String>) -> String? {
+    private func cleanURL(_ url: URL, service: Service) -> String? {
         guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
 
         guard let queryItems = components.queryItems, !queryItems.isEmpty else {
             return nil // No query params to clean
         }
 
-        let filtered = queryItems.filter { !trackingParams.contains($0.name.lowercased()) }
+        if service.removeAllParams {
+            components.queryItems = nil
+            return components.string
+        }
+
+        let filtered = queryItems.filter { !service.trackingParams.contains($0.name.lowercased()) }
 
         // Only return if we actually removed something
         guard filtered.count < queryItems.count else { return nil }

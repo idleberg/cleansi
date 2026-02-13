@@ -20,6 +20,7 @@ struct PreferencesView: View {
     @AppStorage("youtubeEnabled") private var youtubeEnabled = true
     @AppStorage("spotifyEnabled") private var spotifyEnabled = true
     @AppStorage("instagramEnabled") private var instagramEnabled = true
+    @AppStorage("amazonEnabled") private var amazonEnabled = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -39,6 +40,12 @@ struct PreferencesView: View {
                 title: "Instagram",
                 description: "Removes tracking parameters (igsh, igshid, utm_*) from post, reel, and story URLs.",
                 isOn: $instagramEnabled
+            )
+
+            ServiceToggle(
+                title: "Amazon",
+                description: "Removes all query parameters from product URLs. Supports all international Amazon domains.",
+                isOn: $amazonEnabled
             )
         }
         .padding(20)
