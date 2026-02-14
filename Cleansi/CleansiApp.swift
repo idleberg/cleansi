@@ -63,8 +63,9 @@ struct PreferencesView: View {
 
 			Divider()
 
-			VStack(spacing: 4) {
-				Text("The MIT License © 2026 Jan T. Sott")
+			HStack(spacing: 4) {
+				Text("The MIT License")
+				Text("·")
 				Link(
 					"https://github.com/idleberg/cleansi",
 					destination: URL(string: "https://github.com/idleberg/cleansi")!)
