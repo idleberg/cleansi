@@ -27,25 +27,29 @@ struct PreferencesView: View {
 		VStack(alignment: .leading, spacing: 20) {
 			ServiceToggle(
 				title: "YouTube",
-				description: "Removes tracking parameters (si, feature, utm_*) from video, shorts, and playlist URLs.",
+				description:
+					"Removes tracking parameters (si, feature, utm_*) from video, shorts, and playlist URLs.",
 				isOn: $youtubeEnabled
 			)
 
 			ServiceToggle(
 				title: "Spotify",
-				description: "Removes tracking parameters (si, nd, context, utm_*) from track, album, playlist, and artist URLs.",
+				description:
+					"Removes tracking parameters (si, nd, context, utm_*) from track, album, playlist, and artist URLs.",
 				isOn: $spotifyEnabled
 			)
 
 			ServiceToggle(
 				title: "Instagram",
-				description: "Removes tracking parameters (igsh, igshid, utm_*) from post, reel, and story URLs.",
+				description:
+					"Removes tracking parameters (igsh, igshid, utm_*) from post, reel, and story URLs.",
 				isOn: $instagramEnabled
 			)
 
 			ServiceToggle(
 				title: "Amazon",
-				description: "Removes all query parameters from product URLs. Supports all international Amazon domains.",
+				description:
+					"Removes all query parameters from product URLs. Supports all international Amazon domains.",
 				isOn: $amazonEnabled
 			)
 
@@ -56,6 +60,18 @@ struct PreferencesView: View {
 				description: "Show a notification when a URL has been cleaned.",
 				isOn: $notificationsEnabled
 			)
+
+			Divider()
+
+			VStack(spacing: 4) {
+				Text("The MIT License © 2026 Jan T. Sott")
+				Link(
+					"https://github.com/idleberg/cleansi",
+					destination: URL(string: "https://github.com/idleberg/cleansi")!)
+			}
+			.font(.footnote)
+			.foregroundStyle(.secondary)
+			.frame(maxWidth: .infinity)
 		}
 		.padding(20)
 		.frame(width: 380)
