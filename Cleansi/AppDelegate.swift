@@ -1,5 +1,6 @@
 import Cocoa
 import SwiftUI
+import UserNotifications
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private static let appName = "Cleansi"
@@ -14,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	@AppStorage("instagramEnabled") private var instagramEnabled = true
 	@AppStorage("amazonEnabled") private var amazonEnabled = true
 	@AppStorage("monitoringEnabled") private var monitoringEnabled = true
+	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusItem()
@@ -41,6 +43,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		)
 		monitoringItem.target = self
 		menu.addItem(monitoringItem)
+
+		// Notifications toggle
+		let notificationsItem = NSMenuItem(
+			title: notificationsEnabled ? "✓ Notifications Enabled" : "○ Notifications Disabled",
+			action: #selector(toggleNotifications),
+			keyEquivalent: "n"
+		)
+		notificationsItem.target = self
+		menu.addItem(notificationsItem)
 
 		menu.addItem(NSMenuItem.separator())
 
@@ -81,15 +92,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			spotifyEnabled: { [weak self] in self?.spotifyEnabled ?? true },
 			instagramEnabled: { [weak self] in self?.instagramEnabled ?? true },
 			amazonEnabled: { [weak self] in self?.amazonEnabled ?? true },
-			onClean: { [weak self] in
+			onClean: { [weak self] serviceName in
 				self?.updateMenu()
-				self?.showNotification()
+				self?.showIconFeedback()
+				self?.sendNotification(serviceName: serviceName)
 			}
 		)
 		clipboardMonitor.startMonitoring()
 	}
 
-	private func showNotification() {
+	private func showIconFeedback() {
 		if let button = statusItem.button {
 			// Flash the icon to indicate cleaning occurred
 			let originalImage = button.image
@@ -98,6 +110,39 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
 				button.image = originalImage
 			}
+		}
+	}
+
+	private func sendNotification(serviceName: String) {
+		guard notificationsEnabled else { return }
+
+		let content = UNMutableNotificationContent()
+		content.title = "URL Cleaned"
+		content.body = "\(serviceName) URL has been cleaned"
+
+		let request = UNNotificationRequest(
+			identifier: UUID().uuidString,
+			content: content,
+			trigger: nil
+		)
+
+		UNUserNotificationCenter.current().add(request)
+	}
+
+	@objc private func toggleNotifications() {
+		if !notificationsEnabled {
+			// Request permission when enabling
+			UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { [weak self] granted, _ in
+				DispatchQueue.main.async {
+					if granted {
+						self?.notificationsEnabled = true
+						self?.updateMenu()
+					}
+				}
+			}
+		} else {
+			notificationsEnabled = false
+			updateMenu()
 		}
 	}
 

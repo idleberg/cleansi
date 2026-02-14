@@ -21,6 +21,7 @@ struct PreferencesView: View {
 	@AppStorage("spotifyEnabled") private var spotifyEnabled = true
 	@AppStorage("instagramEnabled") private var instagramEnabled = true
 	@AppStorage("amazonEnabled") private var amazonEnabled = true
+	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 20) {
@@ -46,6 +47,14 @@ struct PreferencesView: View {
 				title: "Amazon",
 				description: "Removes all query parameters from product URLs. Supports all international Amazon domains.",
 				isOn: $amazonEnabled
+			)
+
+			Divider()
+
+			ServiceToggle(
+				title: "Notifications",
+				description: "Show a notification when a URL has been cleaned.",
+				isOn: $notificationsEnabled
 			)
 		}
 		.padding(20)

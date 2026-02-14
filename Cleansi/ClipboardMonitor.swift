@@ -26,7 +26,7 @@ class ClipboardMonitor {
 
 	private let isEnabled: () -> Bool
 	private let serviceEnabled: (String) -> Bool
-	private let onClean: () -> Void
+	private let onClean: (String) -> Void
 
 	private static let services: [Service] = [
 		Service(
@@ -67,7 +67,7 @@ class ClipboardMonitor {
 		spotifyEnabled: @escaping () -> Bool,
 		instagramEnabled: @escaping () -> Bool,
 		amazonEnabled: @escaping () -> Bool,
-		onClean: @escaping () -> Void
+		onClean: @escaping (String) -> Void
 	) {
 		self.isEnabled = isEnabled
 		self.onClean = onClean
@@ -104,22 +104,23 @@ class ClipboardMonitor {
 
 		guard let content = pasteboard.string(forType: .string) else { return }
 
-		let cleanedContent = cleanURLs(in: content)
+		let (cleanedContent, serviceName) = cleanURLs(in: content)
 
-		if cleanedContent != content {
+		if cleanedContent != content, let serviceName = serviceName {
 			pasteboard.clearContents()
 			pasteboard.setString(cleanedContent, forType: .string)
 			lastChangeCount = pasteboard.changeCount
 
 			ClipboardMonitor.cleanedCount += 1
-			onClean()
+			onClean(serviceName)
 		}
 	}
 
-	private func cleanURLs(in content: String) -> String {
-		guard let detector = urlDetector else { return content }
+	private func cleanURLs(in content: String) -> (String, String?) {
+		guard let detector = urlDetector else { return (content, nil) }
 
 		var result = content
+		var cleanedServiceName: String?
 		let range = NSRange(content.startIndex..., in: content)
 		let matches = detector.matches(in: content, options: [], range: range)
 
@@ -136,10 +137,11 @@ class ClipboardMonitor {
 			// Clean the URL
 			if let cleaned = cleanURL(url, service: service) {
 				result.replaceSubrange(matchRange, with: cleaned)
+				cleanedServiceName = service.id.capitalized
 			}
 		}
 
-		return result
+		return (result, cleanedServiceName)
 	}
 
 	private func cleanURL(_ url: URL, service: Service) -> String? {
