@@ -1,5 +1,6 @@
 import Cocoa
 import SwiftUI
+import UserNotifications
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private static let appName = "Cleansi"
@@ -14,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	@AppStorage("instagramEnabled") private var instagramEnabled = true
 	@AppStorage("amazonEnabled") private var amazonEnabled = true
 	@AppStorage("monitoringEnabled") private var monitoringEnabled = true
+	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusItem()
@@ -81,15 +83,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			spotifyEnabled: { [weak self] in self?.spotifyEnabled ?? true },
 			instagramEnabled: { [weak self] in self?.instagramEnabled ?? true },
 			amazonEnabled: { [weak self] in self?.amazonEnabled ?? true },
-			onClean: { [weak self] in
+			onClean: { [weak self] serviceName in
 				self?.updateMenu()
-				self?.showNotification()
+				self?.showIconFeedback()
+				self?.sendNotification(serviceName: serviceName)
 			}
 		)
 		clipboardMonitor.startMonitoring()
 	}
 
-	private func showNotification() {
+	private func showIconFeedback() {
 		if let button = statusItem.button {
 			// Flash the icon to indicate cleaning occurred
 			let originalImage = button.image
@@ -98,6 +101,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
 				button.image = originalImage
 			}
+		}
+	}
+
+	private func sendNotification(serviceName: String) {
+		guard notificationsEnabled else { return }
+
+		let center = UNUserNotificationCenter.current()
+		center.requestAuthorization(options: [.alert]) { granted, _ in
+			guard granted else { return }
+
+			let content = UNMutableNotificationContent()
+			content.title = "URL Cleaned"
+			content.body = "\(serviceName) URL has been cleaned"
+
+			let request = UNNotificationRequest(
+				identifier: UUID().uuidString,
+				content: content,
+				trigger: nil
+			)
+
+			center.add(request)
 		}
 	}
 
