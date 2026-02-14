@@ -24,7 +24,7 @@
 
 	// Swift extension settings (swiftlang.swift-vscode)
 	"swift.swiftEnvironmentVariables": {},
-	"swift.diagnostics": true,
+	"swift.outputChannelLogLevel": "debug",
 
 	// Swift language settings
 	"[swift]": {
