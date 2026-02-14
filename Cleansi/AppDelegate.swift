@@ -44,15 +44,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		monitoringItem.target = self
 		menu.addItem(monitoringItem)
 
-		// Notifications toggle
-		let notificationsItem = NSMenuItem(
-			title: notificationsEnabled ? "✓ Notifications Enabled" : "○ Notifications Disabled",
-			action: #selector(toggleNotifications),
-			keyEquivalent: "n"
-		)
-		notificationsItem.target = self
-		menu.addItem(notificationsItem)
-
 		menu.addItem(NSMenuItem.separator())
 
 		// Preferences
@@ -116,33 +107,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private func sendNotification(serviceName: String) {
 		guard notificationsEnabled else { return }
 
-		let content = UNMutableNotificationContent()
-		content.title = "URL Cleaned"
-		content.body = "\(serviceName) URL has been cleaned"
+		let center = UNUserNotificationCenter.current()
+		center.requestAuthorization(options: [.alert]) { granted, _ in
+			guard granted else { return }
 
-		let request = UNNotificationRequest(
-			identifier: UUID().uuidString,
-			content: content,
-			trigger: nil
-		)
+			let content = UNMutableNotificationContent()
+			content.title = "URL Cleaned"
+			content.body = "\(serviceName) URL has been cleaned"
 
-		UNUserNotificationCenter.current().add(request)
-	}
+			let request = UNNotificationRequest(
+				identifier: UUID().uuidString,
+				content: content,
+				trigger: nil
+			)
 
-	@objc private func toggleNotifications() {
-		if !notificationsEnabled {
-			// Request permission when enabling
-			UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { [weak self] granted, _ in
-				DispatchQueue.main.async {
-					if granted {
-						self?.notificationsEnabled = true
-						self?.updateMenu()
-					}
-				}
-			}
-		} else {
-			notificationsEnabled = false
-			updateMenu()
+			center.add(request)
 		}
 	}
 
