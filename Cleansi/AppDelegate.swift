@@ -41,9 +41,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 		// Main toggle
 		let monitoringItem = NSMenuItem(
-			title: monitoringEnabled ? "✓ Filtering Enabled" : "○ Filtering Disabled",
+			title: monitoringEnabled ? "Pause Filtering" : "Resume Filtering",
 			action: #selector(toggleMonitoring),
 			keyEquivalent: "m"
+		)
+		monitoringItem.image = NSImage(
+			systemSymbolName: monitoringEnabled ? "pause.fill" : "play.fill",
+			accessibilityDescription: monitoringEnabled ? "Pause" : "Resume"
 		)
 		monitoringItem.target = self
 		menu.addItem(monitoringItem)
