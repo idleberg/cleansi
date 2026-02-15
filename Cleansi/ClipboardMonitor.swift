@@ -78,12 +78,18 @@ class ClipboardMonitor {
 			trackingParams: ["si", "nd", "context"]
 		),
 		Service(
+			id: "facebook",
+			name: "Facebook",
+			description: "Removes Facebook Click Identifiers from any URL.",
+			hosts: [],
+			trackingParams: ["fbclid"]
+		),
+		Service(
 			id: "utm",
 			name: "Google Analytics",
 			description: "Removes UTM tracking parameters from any URL.",
 			hosts: [],  // Empty hosts means it matches any URL as fallback
-			trackingParams: utmParams,
-			defaultEnabled: false
+			trackingParams: utmParams
 		),
 		Service(
 			id: "youtube",
