@@ -4,7 +4,7 @@
 >
 > This project is 100% vibe-coded, use at your own risk.
 
-A lightweight macOS menu bar application that automatically removes tracking/sharing IDs from YouTube, Spotify, and Instagram URLs when you copy them to your clipboard.
+A lightweight macOS menu bar application that automatically removes tracking parameters from URLs when you copy them to your clipboard. Supports YouTube, Spotify, Instagram, Amazon, and universal filters for Facebook Click IDs and Google Analytics UTM parameters.
 
 ## Features
 
@@ -26,10 +26,10 @@ A lightweight macOS menu bar application that automatically removes tracking/sha
 
 ### Spotify
 
-| Original URL                                                   | Cleaned URL                             |
-| -------------------------------------------------------------- | --------------------------------------- |
-| `https://open.spotify.com/track/abc123?si=def456`              | `https://open.spotify.com/track/abc123` |
-| `https://open.spotify.com/playlist/xyz?si=abc&utm_source=copy` | `https://open.spotify.com/playlist/xyz` |
+| Original URL                                                    | Cleaned URL                               |
+| --------------------------------------------------------------- | ----------------------------------------- |
+| `https://open.spotify.com/track/abc123?si=def456`               | `https://open.spotify.com/track/abc123`   |
+| `https://open.spotify.com/playlist/xyz?si=abc&nd=1&context=def` | `https://open.spotify.com/playlist/xyz`   |
 
 ### Instagram
 
@@ -37,6 +37,33 @@ A lightweight macOS menu bar application that automatically removes tracking/sha
 | --------------------------------------------- | ------------------------------------ |
 | `https://instagram.com/p/abc123/?igsh=xyz789` | `https://instagram.com/p/abc123/`    |
 | `https://instagram.com/reel/abc123/?igsh=xyz` | `https://instagram.com/reel/abc123/` |
+
+### Amazon
+
+Removes **all** query parameters from Amazon product URLs. Supports all international Amazon domains.
+
+| Original URL                                                           | Cleaned URL                                    |
+| ---------------------------------------------------------------------- | ---------------------------------------------- |
+| `https://amazon.com/dp/B08N5WRWNW?ref=abc&tag=xyz`                     | `https://amazon.com/dp/B08N5WRWNW`             |
+| `https://amazon.de/gp/product/B08N5WRWNW?pf_rd_p=abc&linkCode=xyz`     | `https://amazon.de/gp/product/B08N5WRWNW`      |
+
+### Facebook Click ID (Universal)
+
+Removes `fbclid` parameter from **any URL**. Disabled by default. Can be combined with service-specific filters.
+
+| Original URL                                              | Cleaned URL                          |
+| --------------------------------------------------------- | ------------------------------------ |
+| `https://example.com/page?fbclid=abc123`                  | `https://example.com/page`           |
+| `https://open.spotify.com/track/abc?si=def&fbclid=xyz`    | `https://open.spotify.com/track/abc` |
+
+### Google Analytics UTM (Universal)
+
+Removes UTM tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `utm_id`) from **any URL**. Disabled by default. Can be combined with service-specific filters.
+
+| Original URL                                                       | Cleaned URL                          |
+| ------------------------------------------------------------------ | ------------------------------------ |
+| `https://example.com/page?utm_source=twitter&utm_medium=social`    | `https://example.com/page`           |
+| `https://youtu.be/abc?si=def&utm_campaign=summer`                  | `https://youtu.be/abc`               |
 
 ---
 
