@@ -1,6 +1,31 @@
 import SwiftUI
 
-struct ServiceToggle: View {
+struct ServiceToggleRow: View {
+	let service: Service
+	@State private var isEnabled: Bool
+
+	init(service: Service) {
+		self.service = service
+		// Initialize from UserDefaults with service's default value
+		let storedValue = UserDefaults.standard.object(forKey: "\(service.id)Enabled") as? Bool
+		_isEnabled = State(initialValue: storedValue ?? service.defaultEnabled)
+	}
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 4) {
+			Toggle(service.name, isOn: $isEnabled)
+				.onChange(of: isEnabled) { newValue in
+					UserDefaults.standard.set(newValue, forKey: "\(service.id)Enabled")
+				}
+			Text(service.description)
+				.font(.callout)
+				.foregroundStyle(.secondary)
+				.fixedSize(horizontal: false, vertical: true)
+		}
+	}
+}
+
+struct GeneralToggle: View {
 	let title: String
 	let description: String
 	@Binding var isOn: Bool
@@ -17,65 +42,46 @@ struct ServiceToggle: View {
 }
 
 struct PreferencesView: View {
-	@AppStorage("youtubeEnabled") private var youtubeEnabled = true
-	@AppStorage("spotifyEnabled") private var spotifyEnabled = true
-	@AppStorage("instagramEnabled") private var instagramEnabled = true
-	@AppStorage("amazonEnabled") private var amazonEnabled = true
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
+	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 20) {
-			ServiceToggle(
-				title: "YouTube",
-				description:
-					"Removes tracking parameters (si, feature, utm_*) from video, shorts, and playlist URLs.",
-				isOn: $youtubeEnabled
-			)
+		Form {
+			Section(header: Text("General")) {
+				GeneralToggle(
+					title: "Clean URLs in Text",
+					description: "Also clean links embedded in text, not just standalone URLs.",
+					isOn: $cleanUrlsInText
+				)
 
-			ServiceToggle(
-				title: "Spotify",
-				description:
-					"Removes tracking parameters (si, nd, context, utm_*) from track, album, playlist, and artist URLs.",
-				isOn: $spotifyEnabled
-			)
-
-			ServiceToggle(
-				title: "Instagram",
-				description:
-					"Removes tracking parameters (igsh, igshid, utm_*) from post, reel, and story URLs.",
-				isOn: $instagramEnabled
-			)
-
-			ServiceToggle(
-				title: "Amazon",
-				description:
-					"Removes all query parameters from product URLs. Supports all international Amazon domains.",
-				isOn: $amazonEnabled
-			)
-
-			Divider()
-
-			ServiceToggle(
-				title: "Notifications",
-				description: "Show a notification when a URL has been cleaned.",
-				isOn: $notificationsEnabled
-			)
-
-			Divider()
-
-			HStack(spacing: 4) {
-				Text("The MIT License")
-				Text("·")
-				Link(
-					"https://github.com/idleberg/cleansi",
-					destination: URL(string: "https://github.com/idleberg/cleansi")!)
+				GeneralToggle(
+					title: "Notifications",
+					description: "Show a notification when a URL has been cleaned.",
+					isOn: $notificationsEnabled
+				)
 			}
-			.font(.footnote)
-			.foregroundStyle(.secondary)
-			.frame(maxWidth: .infinity)
+
+			Section(header: Text("Services")) {
+				ForEach(ClipboardMonitor.services) { service in
+					ServiceToggleRow(service: service)
+				}
+			}
+
+			Section {
+				HStack(spacing: 4) {
+					Text("The MIT License")
+					Text("·")
+					Link(
+						"https://github.com/idleberg/cleansi",
+						destination: URL(string: "https://github.com/idleberg/cleansi")!)
+				}
+				.font(.footnote)
+				.foregroundStyle(.secondary)
+				.frame(maxWidth: .infinity)
+			}
 		}
-		.padding(20)
-		.frame(width: 380)
+		.formStyle(.grouped)
+		.frame(width: 400)
 		.fixedSize()
 	}
 }
