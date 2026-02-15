@@ -50,7 +50,7 @@ struct PreferencesView: View {
 			Section(header: Text("General")) {
 				GeneralToggle(
 					title: "Clean URLs in Text",
-					description: "Also clean URLs embedded in text, not just standalone URLs.",
+					description: "Also clean links embedded in text, not just standalone URLs.",
 					isOn: $cleanUrlsInText
 				)
 
