@@ -64,20 +64,6 @@ class ClipboardMonitor {
 			removeAllParams: true
 		),
 		Service(
-			id: "instagram",
-			name: "Instagram",
-			description: "Removes tracking parameters from post, reel, and story URLs.",
-			hosts: ["instagram.com"],
-			trackingParams: ["igsh", "igshid"]
-		),
-		Service(
-			id: "spotify",
-			name: "Spotify",
-			description: "Removes tracking parameters from track, album, playlist, and artist URLs.",
-			hosts: ["spotify.com", "spotify.link"],
-			trackingParams: ["si", "nd", "context"]
-		),
-		Service(
 			id: "facebook",
 			name: "Facebook",
 			description: "Removes Facebook Click Identifiers from any URL.",
@@ -90,6 +76,20 @@ class ClipboardMonitor {
 			description: "Removes UTM tracking parameters from any URL.",
 			hosts: [],  // Empty hosts means it matches any URL as fallback
 			trackingParams: utmParams
+		),
+		Service(
+			id: "instagram",
+			name: "Instagram",
+			description: "Removes tracking parameters from post, reel, and story URLs.",
+			hosts: ["instagram.com"],
+			trackingParams: ["igsh", "igshid"]
+		),
+		Service(
+			id: "spotify",
+			name: "Spotify",
+			description: "Removes tracking parameters from track, album, playlist, and artist URLs.",
+			hosts: ["spotify.com", "spotify.link"],
+			trackingParams: ["si", "nd", "context"]
 		),
 		Service(
 			id: "youtube",
