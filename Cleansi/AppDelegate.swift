@@ -10,14 +10,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private var preferencesWindow: NSWindow?
 
 	// User preferences stored in UserDefaults
-	@AppStorage("youtubeEnabled") private var youtubeEnabled = true
-	@AppStorage("spotifyEnabled") private var spotifyEnabled = true
-	@AppStorage("instagramEnabled") private var instagramEnabled = true
-	@AppStorage("amazonEnabled") private var amazonEnabled = true
 	@AppStorage("monitoringEnabled") private var monitoringEnabled = true
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
-	@AppStorage("utmEnabled") private var utmEnabled = false
+
+	// Dynamic service enabled lookup - reads from UserDefaults based on service ID
+	private func isServiceEnabled(_ serviceId: String) -> Bool {
+		let service = ClipboardMonitor.services.first { $0.id == serviceId }
+		let defaultValue = service?.defaultEnabled ?? true
+		return UserDefaults.standard.object(forKey: "\(serviceId)Enabled") as? Bool ?? defaultValue
+	}
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusItem()
@@ -81,13 +83,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private func setupClipboardMonitor() {
 		clipboardMonitor = ClipboardMonitor(
 			isEnabled: { [weak self] in self?.monitoringEnabled ?? false },
-			youtubeEnabled: { [weak self] in self?.youtubeEnabled ?? true },
-			spotifyEnabled: { [weak self] in self?.spotifyEnabled ?? true },
-			instagramEnabled: { [weak self] in self?.instagramEnabled ?? true },
-			amazonEnabled: { [weak self] in self?.amazonEnabled ?? true },
-			utmEnabled: { [weak self] in self?.utmEnabled ?? false },
+			serviceEnabled: { [weak self] serviceId in self?.isServiceEnabled(serviceId) ?? false },
 			cleanUrlsInText: { [weak self] in self?.cleanUrlsInText ?? false },
-			onClean: { [weak self] serviceName in
+			onClean: { [weak self] (serviceName: String) in
 				self?.updateMenu()
 				self?.showIconFeedback()
 				self?.sendNotification(serviceName: serviceName)

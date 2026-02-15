@@ -1,16 +1,30 @@
 import Cocoa
 
-struct Service {
+struct Service: Identifiable {
 	let id: String
+	let name: String
+	let description: String
 	let hosts: Set<String>
 	let trackingParams: Set<String>
 	let removeAllParams: Bool
+	let defaultEnabled: Bool
 
-	init(id: String, hosts: Set<String>, trackingParams: Set<String> = [], removeAllParams: Bool = false) {
+	init(
+		id: String,
+		name: String,
+		description: String,
+		hosts: Set<String>,
+		trackingParams: Set<String> = [],
+		removeAllParams: Bool = false,
+		defaultEnabled: Bool = true
+	) {
 		self.id = id
+		self.name = name
+		self.description = description
 		self.hosts = hosts
 		self.trackingParams = trackingParams
 		self.removeAllParams = removeAllParams
+		self.defaultEnabled = defaultEnabled
 	}
 
 	func matches(host: String) -> Bool {
@@ -26,32 +40,20 @@ class ClipboardMonitor {
 
 	private let isEnabled: () -> Bool
 	private let serviceEnabled: (String) -> Bool
-	private let utmEnabled: () -> Bool
 	private let cleanUrlsInText: () -> Bool
 	private let onClean: (String) -> Void
 
-	private static let utmParams: Set<String> = [
+	// UTM params defined once - used by "utm" service and can be referenced elsewhere
+	static let utmParams: Set<String> = [
 		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
 	]
 
-	private static let services: [Service] = [
-		Service(
-			id: "youtube",
-			hosts: ["youtube.com", "youtu.be"],
-			trackingParams: ["si", "feature", "app", "pp", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]
-		),
-		Service(
-			id: "spotify",
-			hosts: ["spotify.com", "spotify.link"],
-			trackingParams: ["si", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "nd", "context"]
-		),
-		Service(
-			id: "instagram",
-			hosts: ["instagram.com"],
-			trackingParams: ["igsh", "igshid", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]
-		),
+	// All services defined in one place with full metadata
+	static let services: [Service] = [
 		Service(
 			id: "amazon",
+			name: "Amazon",
+			description: "Removes all query parameters from product URLs. Supports all international Amazon domains.",
 			hosts: [
 				"amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.it", "amazon.es",
 				"amazon.ca", "amazon.com.au", "amazon.co.jp", "amazon.in", "amazon.com.br",
@@ -59,6 +61,35 @@ class ClipboardMonitor {
 				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn"
 			],
 			removeAllParams: true
+		),
+		Service(
+			id: "instagram",
+			name: "Instagram",
+			description: "Removes tracking parameters (igsh, igshid) from post, reel, and story URLs.",
+			hosts: ["instagram.com"],
+			trackingParams: ["igsh", "igshid"]
+		),
+		Service(
+			id: "spotify",
+			name: "Spotify",
+			description: "Removes tracking parameters (si, nd, context) from track, album, playlist, and artist URLs.",
+			hosts: ["spotify.com", "spotify.link"],
+			trackingParams: ["si", "nd", "context"]
+		),
+		Service(
+			id: "utm",
+			name: "Google Analytics",
+			description: "Removes UTM tracking parameters (utm_source, utm_medium, etc.) from any URL.",
+			hosts: [],  // Empty hosts means it matches any URL as fallback
+			trackingParams: utmParams,
+			defaultEnabled: false
+		),
+		Service(
+			id: "youtube",
+			name: "YouTube",
+			description: "Removes tracking parameters (si, feature) from video, shorts, and playlist URLs.",
+			hosts: ["youtube.com", "youtu.be"],
+			trackingParams: ["si", "feature", "app", "pp"]
 		)
 	]
 
@@ -69,29 +100,16 @@ class ClipboardMonitor {
 
 	init(
 		isEnabled: @escaping () -> Bool,
-		youtubeEnabled: @escaping () -> Bool,
-		spotifyEnabled: @escaping () -> Bool,
-		instagramEnabled: @escaping () -> Bool,
-		amazonEnabled: @escaping () -> Bool,
-		utmEnabled: @escaping () -> Bool,
+		serviceEnabled: @escaping (String) -> Bool,
 		cleanUrlsInText: @escaping () -> Bool,
 		onClean: @escaping (String) -> Void
 	) {
 		self.isEnabled = isEnabled
-		self.utmEnabled = utmEnabled
+		self.serviceEnabled = serviceEnabled
 		self.cleanUrlsInText = cleanUrlsInText
 		self.onClean = onClean
 		self.urlDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
 		self.lastChangeCount = pasteboard.changeCount
-
-		// Map service IDs to their enabled closures
-		let enabledMap: [String: () -> Bool] = [
-			"youtube": youtubeEnabled,
-			"spotify": spotifyEnabled,
-			"instagram": instagramEnabled,
-			"amazon": amazonEnabled
-		]
-		self.serviceEnabled = { enabledMap[$0]?() ?? false }
 	}
 
 	func startMonitoring() {
@@ -119,7 +137,6 @@ class ClipboardMonitor {
 		// Determine what to clean based on mode
 		let contentToClean: String
 		if cleanUrlsInText() {
-			// Clean URLs anywhere in text
 			contentToClean = content
 		} else {
 			// Only clean if entire content is a single URL
@@ -149,25 +166,44 @@ class ClipboardMonitor {
 		let range = NSRange(content.startIndex..., in: content)
 		let matches = detector.matches(in: content, options: [], range: range)
 
+		let hostServices = Self.services.filter { !$0.hosts.isEmpty }
+		let fallbackServices = Self.services.filter { $0.hosts.isEmpty }
+
 		// Process in reverse to preserve string indices
 		for match in matches.reversed() {
 			guard let url = match.url,
 					let host = url.host?.lowercased(),
 					let matchRange = Range(match.range, in: result) else { continue }
 
-			// Find matching service
-			if let service = Self.services.first(where: { $0.matches(host: host) }),
-				 serviceEnabled(service.id) {
-				// Clean with service-specific params
-				if let cleaned = cleanURL(url, service: service) {
-					result.replaceSubrange(matchRange, with: cleaned)
-					cleanedServiceName = service.id.capitalized
+			var paramsToRemove = Set<String>()
+			var removeAllParams = false
+			var matchedServiceName: String?
+
+			// Check host-specific service
+			if let service = hostServices.first(where: { $0.matches(host: host) && serviceEnabled($0.id) }) {
+				if service.removeAllParams {
+					removeAllParams = true
+				} else {
+					paramsToRemove.formUnion(service.trackingParams)
 				}
-			} else if utmEnabled() {
-				// No service match, but UTM filtering is enabled
-				if let cleaned = cleanUTMParams(from: url) {
+				matchedServiceName = service.name
+			}
+
+			// Combine with fallback services (like UTM) unless removeAllParams is set
+			if !removeAllParams {
+				for service in fallbackServices where serviceEnabled(service.id) {
+					paramsToRemove.formUnion(service.trackingParams)
+					if matchedServiceName == nil {
+						matchedServiceName = service.name
+					}
+				}
+			}
+
+			// Apply cleaning if we have params to remove or removeAll is set
+			if removeAllParams || !paramsToRemove.isEmpty {
+				if let cleaned = cleanURL(url, removing: paramsToRemove, removeAll: removeAllParams) {
 					result.replaceSubrange(matchRange, with: cleaned)
-					cleanedServiceName = "UTM"
+					cleanedServiceName = matchedServiceName
 				}
 			}
 		}
@@ -175,36 +211,20 @@ class ClipboardMonitor {
 		return (result, cleanedServiceName)
 	}
 
-	private func cleanUTMParams(from url: URL) -> String? {
+	private func cleanURL(_ url: URL, removing paramsToRemove: Set<String>, removeAll: Bool = false) -> String? {
 		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
 
 		guard let queryItems = components.queryItems, !queryItems.isEmpty else {
 			return nil
 		}
 
-		let filtered = queryItems.filter { !Self.utmParams.contains($0.name.lowercased()) }
-
-		guard filtered.count < queryItems.count else { return nil }
-
-		components.queryItems = filtered.isEmpty ? nil : filtered
-		return components.string
-	}
-
-	private func cleanURL(_ url: URL, service: Service) -> String? {
-		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
-
-		guard let queryItems = components.queryItems, !queryItems.isEmpty else {
-			return nil // No query params to clean
-		}
-
-		if service.removeAllParams {
+		if removeAll {
 			components.queryItems = nil
 			return components.string
 		}
 
-		let filtered = queryItems.filter { !service.trackingParams.contains($0.name.lowercased()) }
+		let filtered = queryItems.filter { !paramsToRemove.contains($0.name.lowercased()) }
 
-		// Only return if we actually removed something
 		guard filtered.count < queryItems.count else { return nil }
 
 		components.queryItems = filtered.isEmpty ? nil : filtered

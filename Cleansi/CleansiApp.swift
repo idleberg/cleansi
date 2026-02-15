@@ -1,6 +1,31 @@
 import SwiftUI
 
-struct ServiceToggle: View {
+struct ServiceToggleRow: View {
+	let service: Service
+	@State private var isEnabled: Bool
+
+	init(service: Service) {
+		self.service = service
+		// Initialize from UserDefaults with service's default value
+		let storedValue = UserDefaults.standard.object(forKey: "\(service.id)Enabled") as? Bool
+		_isEnabled = State(initialValue: storedValue ?? service.defaultEnabled)
+	}
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 4) {
+			Toggle(service.name, isOn: $isEnabled)
+				.onChange(of: isEnabled) { newValue in
+					UserDefaults.standard.set(newValue, forKey: "\(service.id)Enabled")
+				}
+			Text(service.description)
+				.font(.callout)
+				.foregroundStyle(.secondary)
+				.fixedSize(horizontal: false, vertical: true)
+		}
+	}
+}
+
+struct GeneralToggle: View {
 	let title: String
 	let description: String
 	@Binding var isOn: Bool
@@ -17,24 +42,19 @@ struct ServiceToggle: View {
 }
 
 struct PreferencesView: View {
-	@AppStorage("youtubeEnabled") private var youtubeEnabled = true
-	@AppStorage("spotifyEnabled") private var spotifyEnabled = true
-	@AppStorage("instagramEnabled") private var instagramEnabled = true
-	@AppStorage("amazonEnabled") private var amazonEnabled = true
-	@AppStorage("utmEnabled") private var utmEnabled = false
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
 
 	var body: some View {
 		Form {
 			Section(header: Text("General")) {
-				ServiceToggle(
+				GeneralToggle(
 					title: "Clean URLs in Text",
 					description: "Also clean URLs embedded in text, not just standalone URLs.",
 					isOn: $cleanUrlsInText
 				)
 
-				ServiceToggle(
+				GeneralToggle(
 					title: "Notifications",
 					description: "Show a notification when a URL has been cleaned.",
 					isOn: $notificationsEnabled
@@ -42,40 +62,9 @@ struct PreferencesView: View {
 			}
 
 			Section(header: Text("Services")) {
-				ServiceToggle(
-					title: "Amazon",
-					description:
-						"Removes all query parameters from product URLs. Supports all international Amazon domains.",
-					isOn: $amazonEnabled
-				)
-
-				ServiceToggle(
-					title: "Google Analytics",
-					description:
-						"Removes UTM tracking parameters (utm_source, utm_medium, etc.) from any URL.",
-					isOn: $utmEnabled
-				)
-
-				ServiceToggle(
-					title: "Instagram",
-					description:
-						"Removes tracking parameters (igsh, igshid) from post, reel, and story URLs.",
-					isOn: $instagramEnabled
-				)
-
-				ServiceToggle(
-					title: "Spotify",
-					description:
-						"Removes tracking parameters (si, nd, context) from track, album, playlist, and artist URLs.",
-					isOn: $spotifyEnabled
-				)
-
-				ServiceToggle(
-					title: "YouTube",
-					description:
-						"Removes tracking parameters (si, feature) from video, shorts, and playlist URLs.",
-					isOn: $youtubeEnabled
-				)
+				ForEach(ClipboardMonitor.services) { service in
+					ServiceToggleRow(service: service)
+				}
 			}
 
 			Section {
