@@ -49,7 +49,7 @@ Removes **all** query parameters from Amazon product URLs. Supports all internat
 
 ### Facebook Click ID (Universal)
 
-Removes `fbclid` parameter from **any URL**. Disabled by default. Can be combined with service-specific filters.
+Removes `fbclid` parameter from **any URL**. Can be combined with service-specific filters.
 
 | Original URL                                              | Cleaned URL                          |
 | --------------------------------------------------------- | ------------------------------------ |
@@ -58,7 +58,7 @@ Removes `fbclid` parameter from **any URL**. Disabled by default. Can be combine
 
 ### Google Analytics UTM (Universal)
 
-Removes UTM tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `utm_id`) from **any URL**. Disabled by default. Can be combined with service-specific filters.
+Removes UTM tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `utm_id`) from **any URL**. Can be combined with service-specific filters.
 
 | Original URL                                                       | Cleaned URL                          |
 | ------------------------------------------------------------------ | ------------------------------------ |
