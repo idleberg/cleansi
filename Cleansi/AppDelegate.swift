@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	@AppStorage("amazonEnabled") private var amazonEnabled = true
 	@AppStorage("monitoringEnabled") private var monitoringEnabled = true
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
+	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusItem()
@@ -83,6 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			spotifyEnabled: { [weak self] in self?.spotifyEnabled ?? true },
 			instagramEnabled: { [weak self] in self?.instagramEnabled ?? true },
 			amazonEnabled: { [weak self] in self?.amazonEnabled ?? true },
+			cleanUrlsInText: { [weak self] in self?.cleanUrlsInText ?? false },
 			onClean: { [weak self] serviceName in
 				self?.updateMenu()
 				self?.showIconFeedback()

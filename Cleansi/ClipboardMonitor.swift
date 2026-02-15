@@ -26,6 +26,7 @@ class ClipboardMonitor {
 
 	private let isEnabled: () -> Bool
 	private let serviceEnabled: (String) -> Bool
+	private let cleanUrlsInText: () -> Bool
 	private let onClean: (String) -> Void
 
 	private static let services: [Service] = [
@@ -67,9 +68,11 @@ class ClipboardMonitor {
 		spotifyEnabled: @escaping () -> Bool,
 		instagramEnabled: @escaping () -> Bool,
 		amazonEnabled: @escaping () -> Bool,
+		cleanUrlsInText: @escaping () -> Bool,
 		onClean: @escaping (String) -> Void
 	) {
 		self.isEnabled = isEnabled
+		self.cleanUrlsInText = cleanUrlsInText
 		self.onClean = onClean
 		self.urlDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
 		self.lastChangeCount = pasteboard.changeCount
@@ -104,9 +107,24 @@ class ClipboardMonitor {
 
 		guard let content = pasteboard.string(forType: .string) else { return }
 
-		let (cleanedContent, serviceName) = cleanURLs(in: content)
+		let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
 
-		if cleanedContent != content, let serviceName = serviceName {
+		// Determine what to clean based on mode
+		let contentToClean: String
+		if cleanUrlsInText() {
+			// Clean URLs anywhere in text
+			contentToClean = content
+		} else {
+			// Only clean if entire content is a single URL
+			guard let url = URL(string: trimmedContent),
+				  url.scheme != nil,
+				  url.host != nil else { return }
+			contentToClean = trimmedContent
+		}
+
+		let (cleanedContent, serviceName) = cleanURLs(in: contentToClean)
+
+		if cleanedContent != contentToClean, let serviceName = serviceName {
 			pasteboard.clearContents()
 			pasteboard.setString(cleanedContent, forType: .string)
 			lastChangeCount = pasteboard.changeCount

@@ -22,6 +22,7 @@ struct PreferencesView: View {
 	@AppStorage("instagramEnabled") private var instagramEnabled = true
 	@AppStorage("amazonEnabled") private var amazonEnabled = true
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
+	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 20) {
@@ -59,6 +60,12 @@ struct PreferencesView: View {
 				title: "Notifications",
 				description: "Show a notification when a URL has been cleaned.",
 				isOn: $notificationsEnabled
+			)
+
+			ServiceToggle(
+				title: "Clean URLs in Text",
+				description: "Also clean URLs embedded in text, not just standalone URLs.",
+				isOn: $cleanUrlsInText
 			)
 
 			Divider()
