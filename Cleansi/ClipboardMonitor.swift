@@ -26,8 +26,13 @@ class ClipboardMonitor {
 
 	private let isEnabled: () -> Bool
 	private let serviceEnabled: (String) -> Bool
+	private let utmEnabled: () -> Bool
 	private let cleanUrlsInText: () -> Bool
 	private let onClean: (String) -> Void
+
+	private static let utmParams: Set<String> = [
+		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
+	]
 
 	private static let services: [Service] = [
 		Service(
@@ -68,10 +73,12 @@ class ClipboardMonitor {
 		spotifyEnabled: @escaping () -> Bool,
 		instagramEnabled: @escaping () -> Bool,
 		amazonEnabled: @escaping () -> Bool,
+		utmEnabled: @escaping () -> Bool,
 		cleanUrlsInText: @escaping () -> Bool,
 		onClean: @escaping (String) -> Void
 	) {
 		self.isEnabled = isEnabled
+		self.utmEnabled = utmEnabled
 		self.cleanUrlsInText = cleanUrlsInText
 		self.onClean = onClean
 		self.urlDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
@@ -149,17 +156,38 @@ class ClipboardMonitor {
 					let matchRange = Range(match.range, in: result) else { continue }
 
 			// Find matching service
-			guard let service = Self.services.first(where: { $0.matches(host: host) }),
-					serviceEnabled(service.id) else { continue }
-
-			// Clean the URL
-			if let cleaned = cleanURL(url, service: service) {
-				result.replaceSubrange(matchRange, with: cleaned)
-				cleanedServiceName = service.id.capitalized
+			if let service = Self.services.first(where: { $0.matches(host: host) }),
+				 serviceEnabled(service.id) {
+				// Clean with service-specific params
+				if let cleaned = cleanURL(url, service: service) {
+					result.replaceSubrange(matchRange, with: cleaned)
+					cleanedServiceName = service.id.capitalized
+				}
+			} else if utmEnabled() {
+				// No service match, but UTM filtering is enabled
+				if let cleaned = cleanUTMParams(from: url) {
+					result.replaceSubrange(matchRange, with: cleaned)
+					cleanedServiceName = "UTM"
+				}
 			}
 		}
 
 		return (result, cleanedServiceName)
+	}
+
+	private func cleanUTMParams(from url: URL) -> String? {
+		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+
+		guard let queryItems = components.queryItems, !queryItems.isEmpty else {
+			return nil
+		}
+
+		let filtered = queryItems.filter { !Self.utmParams.contains($0.name.lowercased()) }
+
+		guard filtered.count < queryItems.count else { return nil }
+
+		components.queryItems = filtered.isEmpty ? nil : filtered
+		return components.string
 	}
 
 	private func cleanURL(_ url: URL, service: Service) -> String? {

@@ -21,6 +21,7 @@ struct PreferencesView: View {
 	@AppStorage("spotifyEnabled") private var spotifyEnabled = true
 	@AppStorage("instagramEnabled") private var instagramEnabled = true
 	@AppStorage("amazonEnabled") private var amazonEnabled = true
+	@AppStorage("utmEnabled") private var utmEnabled = false
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
 
@@ -49,23 +50,30 @@ struct PreferencesView: View {
 				)
 
 				ServiceToggle(
+					title: "Google Analytics",
+					description:
+						"Removes UTM tracking parameters (utm_source, utm_medium, etc.) from any URL.",
+					isOn: $utmEnabled
+				)
+
+				ServiceToggle(
 					title: "Instagram",
 					description:
-						"Removes tracking parameters (igsh, igshid, utm_*) from post, reel, and story URLs.",
+						"Removes tracking parameters (igsh, igshid) from post, reel, and story URLs.",
 					isOn: $instagramEnabled
 				)
 
 				ServiceToggle(
 					title: "Spotify",
 					description:
-						"Removes tracking parameters (si, nd, context, utm_*) from track, album, playlist, and artist URLs.",
+						"Removes tracking parameters (si, nd, context) from track, album, playlist, and artist URLs.",
 					isOn: $spotifyEnabled
 				)
 
 				ServiceToggle(
 					title: "YouTube",
 					description:
-						"Removes tracking parameters (si, feature, utm_*) from video, shorts, and playlist URLs.",
+						"Removes tracking parameters (si, feature) from video, shorts, and playlist URLs.",
 					isOn: $youtubeEnabled
 				)
 			}
