@@ -45,7 +45,7 @@ class ClipboardMonitor {
 
 	// UTM params defined once - used by "utm" service and can be referenced elsewhere
 	static let utmParams: Set<String> = [
-		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
+		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id",
 	]
 
 	// All services defined in one place with full metadata
@@ -53,33 +53,34 @@ class ClipboardMonitor {
 		Service(
 			id: "amazon",
 			name: "Amazon",
-			description: "Removes all query parameters from product URLs. Supports all international Amazon domains.",
+			description:
+				"Removes all query parameters from product URLs. Supports all international Amazon domains.",
 			hosts: [
 				"amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.it", "amazon.es",
 				"amazon.ca", "amazon.com.au", "amazon.co.jp", "amazon.in", "amazon.com.br",
 				"amazon.com.mx", "amazon.nl", "amazon.pl", "amazon.se", "amazon.sg",
-				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn"
+				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn",
 			],
 			removeAllParams: true
 		),
 		Service(
 			id: "instagram",
 			name: "Instagram",
-			description: "Removes tracking parameters (igsh, igshid) from post, reel, and story URLs.",
+			description: "Removes tracking parameters from post, reel, and story URLs.",
 			hosts: ["instagram.com"],
 			trackingParams: ["igsh", "igshid"]
 		),
 		Service(
 			id: "spotify",
 			name: "Spotify",
-			description: "Removes tracking parameters (si, nd, context) from track, album, playlist, and artist URLs.",
+			description: "Removes tracking parameters from track, album, playlist, and artist URLs.",
 			hosts: ["spotify.com", "spotify.link"],
 			trackingParams: ["si", "nd", "context"]
 		),
 		Service(
 			id: "utm",
 			name: "Google Analytics",
-			description: "Removes UTM tracking parameters (utm_source, utm_medium, etc.) from any URL.",
+			description: "Removes UTM tracking parameters from any URL.",
 			hosts: [],  // Empty hosts means it matches any URL as fallback
 			trackingParams: utmParams,
 			defaultEnabled: false
@@ -87,10 +88,10 @@ class ClipboardMonitor {
 		Service(
 			id: "youtube",
 			name: "YouTube",
-			description: "Removes tracking parameters (si, feature) from video, shorts, and playlist URLs.",
+			description: "Removes tracking parameters from video, shorts, and playlist URLs.",
 			hosts: ["youtube.com", "youtu.be"],
 			trackingParams: ["si", "feature", "app", "pp"]
-		)
+		),
 	]
 
 	static var cleanedCount: Int {
@@ -141,8 +142,9 @@ class ClipboardMonitor {
 		} else {
 			// Only clean if entire content is a single URL
 			guard let url = URL(string: trimmedContent),
-				  url.scheme != nil,
-				  url.host != nil else { return }
+				url.scheme != nil,
+				url.host != nil
+			else { return }
 			contentToClean = trimmedContent
 		}
 
@@ -172,15 +174,17 @@ class ClipboardMonitor {
 		// Process in reverse to preserve string indices
 		for match in matches.reversed() {
 			guard let url = match.url,
-					let host = url.host?.lowercased(),
-					let matchRange = Range(match.range, in: result) else { continue }
+				let host = url.host?.lowercased(),
+				let matchRange = Range(match.range, in: result)
+			else { continue }
 
 			var paramsToRemove = Set<String>()
 			var removeAllParams = false
 			var matchedServiceName: String?
 
 			// Check host-specific service
-			if let service = hostServices.first(where: { $0.matches(host: host) && serviceEnabled($0.id) }) {
+			if let service = hostServices.first(where: { $0.matches(host: host) && serviceEnabled($0.id) }
+			) {
 				if service.removeAllParams {
 					removeAllParams = true
 				} else {
@@ -211,8 +215,12 @@ class ClipboardMonitor {
 		return (result, cleanedServiceName)
 	}
 
-	private func cleanURL(_ url: URL, removing paramsToRemove: Set<String>, removeAll: Bool = false) -> String? {
-		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+	private func cleanURL(_ url: URL, removing paramsToRemove: Set<String>, removeAll: Bool = false)
+		-> String?
+	{
+		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+			return nil
+		}
 
 		guard let queryItems = components.queryItems, !queryItems.isEmpty else {
 			return nil
