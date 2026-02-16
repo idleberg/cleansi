@@ -45,7 +45,7 @@ class ClipboardMonitor {
 
 	// UTM params defined once - used by "utm" service and can be referenced elsewhere
 	static let utmParams: Set<String> = [
-		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
+		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id",
 	]
 
 	// All services defined in one place with full metadata
@@ -59,7 +59,7 @@ class ClipboardMonitor {
 				"amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.it", "amazon.es",
 				"amazon.ca", "amazon.com.au", "amazon.co.jp", "amazon.in", "amazon.com.br",
 				"amazon.com.mx", "amazon.nl", "amazon.pl", "amazon.se", "amazon.sg",
-				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn"
+				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn",
 			],
 			removeAllParams: true
 		),
@@ -89,7 +89,7 @@ class ClipboardMonitor {
 			name: "Spotify",
 			description: "Removes tracking parameters from track, album, playlist, and artist URLs.",
 			hosts: ["spotify.com", "spotify.link"],
-			trackingParams: ["si", "nd", "pd", "context"]
+			trackingParams: ["si", "nd", "pt", "context"]
 		),
 		Service(
 			id: "youtube",
@@ -97,7 +97,7 @@ class ClipboardMonitor {
 			description: "Removes tracking parameters from video, shorts, and playlist URLs.",
 			hosts: ["youtube.com", "youtu.be"],
 			trackingParams: ["si", "feature", "app", "pp"]
-		)
+		),
 	]
 
 	static var cleanedCount: Int {
@@ -217,7 +217,8 @@ class ClipboardMonitor {
 	}
 
 	private func cleanURL(_ url: URL, removing paramsToRemove: Set<String>, removeAll: Bool = false)
-		-> String? {
+		-> String?
+	{
 		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
 			return nil
 		}
