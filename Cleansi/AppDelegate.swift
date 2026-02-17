@@ -182,8 +182,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 	func windowWillClose(_ notification: Notification) {
 		if let window = notification.object as? NSWindow,
-			window == preferencesWindow || window == aboutWindow
-		{
+			window == preferencesWindow || window == aboutWindow {
 			NSApp.setActivationPolicy(.accessory)
 		}
 	}

@@ -3,8 +3,7 @@ import SwiftUI
 struct AboutView: View {
 	private var versionString: String {
 		if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
-			version != "development"
-		{
+			version != "development" {
 			return "Version \(version)"
 		}
 		return "Development Version"
