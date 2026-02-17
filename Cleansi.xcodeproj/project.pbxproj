@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1000020234567890ABCDEF1 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000021234567890ABCDEF1 /* AboutView.swift */; };
 		A1000001234567890ABCDEF1 /* CleansiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000002234567890ABCDEF1 /* CleansiApp.swift */; };
 		A1000003234567890ABCDEF1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004234567890ABCDEF1 /* AppDelegate.swift */; };
 		A1000005234567890ABCDEF1 /* ClipboardMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006234567890ABCDEF1 /* ClipboardMonitor.swift */; };
@@ -14,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A1000021234567890ABCDEF1 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		A1000002234567890ABCDEF1 /* CleansiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleansiApp.swift; sourceTree = "<group>"; };
 		A1000004234567890ABCDEF1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A1000006234567890ABCDEF1 /* ClipboardMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardMonitor.swift; sourceTree = "<group>"; };
@@ -45,6 +47,7 @@
 		A100000C234567890ABCDEF1 /* Cleansi */ = {
 			isa = PBXGroup;
 			children = (
+				A1000021234567890ABCDEF1 /* AboutView.swift */,
 				A1000002234567890ABCDEF1 /* CleansiApp.swift */,
 				A1000004234567890ABCDEF1 /* AppDelegate.swift */,
 				A1000006234567890ABCDEF1 /* ClipboardMonitor.swift */,
@@ -132,6 +135,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1000020234567890ABCDEF1 /* AboutView.swift in Sources */,
 				A1000001234567890ABCDEF1 /* CleansiApp.swift in Sources */,
 				A1000003234567890ABCDEF1 /* AppDelegate.swift in Sources */,
 				A1000005234567890ABCDEF1 /* ClipboardMonitor.swift in Sources */,

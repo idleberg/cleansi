@@ -8,6 +8,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private var statusItem: NSStatusItem!
 	private var clipboardMonitor: ClipboardMonitor!
 	private var preferencesWindow: NSWindow?
+	private var aboutWindow: NSWindow?
 
 	// User preferences stored in UserDefaults
 	@AppStorage("monitoringEnabled") private var monitoringEnabled = true
@@ -30,7 +31,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
 		if let button = statusItem.button {
-			button.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: Self.appName)
+			button.image = NSImage(
+				systemSymbolName: "doc.on.clipboard", accessibilityDescription: Self.appName)
 		}
 
 		updateMenu()
@@ -63,6 +65,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		preferencesItem.target = self
 		menu.addItem(preferencesItem)
 
+		// About
+		let aboutItem = NSMenuItem(
+			title: "About",
+			action: #selector(showAbout),
+			keyEquivalent: ""
+		)
+		aboutItem.target = self
+		menu.addItem(aboutItem)
+
 		menu.addItem(NSMenuItem.separator())
 
 		// Statistics
@@ -77,7 +88,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		menu.addItem(NSMenuItem.separator())
 
 		// Quit
-		let quitItem = NSMenuItem(title: "Quit \(Self.appName)", action: #selector(quitApp), keyEquivalent: "q")
+		let quitItem = NSMenuItem(
+			title: "Quit \(Self.appName)", action: #selector(quitApp), keyEquivalent: "q")
 		quitItem.target = self
 		menu.addItem(quitItem)
 
@@ -102,7 +114,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		if let button = statusItem.button {
 			// Flash the icon to indicate cleaning occurred
 			let originalImage = button.image
-			button.image = NSImage(systemSymbolName: "checkmark.circle.fill", accessibilityDescription: "Cleaned")
+			button.image = NSImage(
+				systemSymbolName: "checkmark.circle.fill", accessibilityDescription: "Cleaned")
 
 			DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
 				button.image = originalImage
@@ -168,9 +181,34 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	}
 
 	func windowWillClose(_ notification: Notification) {
-		if notification.object as? NSWindow == preferencesWindow {
+		if let window = notification.object as? NSWindow,
+			window == preferencesWindow || window == aboutWindow {
 			NSApp.setActivationPolicy(.accessory)
 		}
+	}
+
+	@objc private func showAbout() {
+		if aboutWindow == nil {
+			let aboutView = AboutView()
+			let hostingView = NSHostingView(rootView: aboutView)
+			hostingView.setFrameSize(hostingView.fittingSize)
+
+			aboutWindow = NSWindow(
+				contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
+				styleMask: [.titled, .closable],
+				backing: .buffered,
+				defer: false
+			)
+			aboutWindow?.title = "About"
+			aboutWindow?.contentView = hostingView
+			aboutWindow?.center()
+			aboutWindow?.isReleasedWhenClosed = false
+			aboutWindow?.delegate = self
+		}
+
+		NSApp.setActivationPolicy(.regular)
+		aboutWindow?.makeKeyAndOrderFront(nil)
+		NSApp.activate(ignoringOtherApps: true)
 	}
 
 	@objc private func quitApp() {

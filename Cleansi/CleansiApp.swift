@@ -66,19 +66,6 @@ struct PreferencesView: View {
 					ServiceToggleRow(service: service)
 				}
 			}
-
-			Section {
-				HStack(spacing: 4) {
-					Text("The MIT License")
-					Text("·")
-					Link(
-						"https://github.com/idleberg/cleansi",
-						destination: URL(string: "https://github.com/idleberg/cleansi")!)
-				}
-				.font(.footnote)
-				.foregroundStyle(.secondary)
-				.frame(maxWidth: .infinity)
-			}
 		}
 		.formStyle(.grouped)
 		.frame(width: 400)
