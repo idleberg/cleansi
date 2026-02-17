@@ -41,6 +41,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private func updateMenu() {
 		let menu = NSMenu()
 
+		// Statistics
+		let statsItem = NSMenuItem(
+			title: "URLs Cleaned: \(ClipboardMonitor.cleanedCount)",
+			action: nil,
+			keyEquivalent: ""
+		)
+		statsItem.isEnabled = false
+		menu.addItem(statsItem)
+
+		menu.addItem(NSMenuItem.separator())
+
 		// Main toggle
 		let monitoringItem = NSMenuItem(
 			title: monitoringEnabled ? "Pause Filtering" : "Resume Filtering",
@@ -73,17 +84,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		)
 		aboutItem.target = self
 		menu.addItem(aboutItem)
-
-		menu.addItem(NSMenuItem.separator())
-
-		// Statistics
-		let statsItem = NSMenuItem(
-			title: "URLs Cleaned: \(ClipboardMonitor.cleanedCount)",
-			action: nil,
-			keyEquivalent: ""
-		)
-		statsItem.isEnabled = false
-		menu.addItem(statsItem)
 
 		menu.addItem(NSMenuItem.separator())
 
@@ -182,7 +182,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 	func windowWillClose(_ notification: Notification) {
 		if let window = notification.object as? NSWindow,
-			window == preferencesWindow || window == aboutWindow {
+			window == preferencesWindow || window == aboutWindow
+		{
 			NSApp.setActivationPolicy(.accessory)
 		}
 	}
@@ -204,10 +205,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			aboutWindow?.center()
 			aboutWindow?.isReleasedWhenClosed = false
 			aboutWindow?.delegate = self
+			aboutWindow?.initialFirstResponder = nil
 		}
 
 		NSApp.setActivationPolicy(.regular)
 		aboutWindow?.makeKeyAndOrderFront(nil)
+		aboutWindow?.makeFirstResponder(nil)
 		NSApp.activate(ignoringOtherApps: true)
 	}
 
