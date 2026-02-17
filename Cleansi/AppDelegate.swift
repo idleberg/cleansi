@@ -25,6 +25,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusItem()
 		setupClipboardMonitor()
+		observeCleanedCount()
+	}
+
+	private var cleanedCountObserver: NSObjectProtocol?
+
+	private func observeCleanedCount() {
+		cleanedCountObserver = NotificationCenter.default.addObserver(
+			forName: UserDefaults.didChangeNotification,
+			object: nil,
+			queue: .main
+		) { [weak self] _ in
+			self?.updateMenu()
+		}
 	}
 
 	private func setupStatusItem() {

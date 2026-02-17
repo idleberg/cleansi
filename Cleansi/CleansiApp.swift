@@ -44,6 +44,7 @@ struct GeneralToggle: View {
 struct PreferencesView: View {
 	@AppStorage("notificationsEnabled") private var notificationsEnabled = false
 	@AppStorage("cleanUrlsInText") private var cleanUrlsInText = false
+	@AppStorage("cleanedCount") private var cleanedCount = 0
 
 	var body: some View {
 		Form {
@@ -64,6 +65,16 @@ struct PreferencesView: View {
 			Section(header: Text("Services")) {
 				ForEach(ClipboardMonitor.services) { service in
 					ServiceToggleRow(service: service)
+				}
+			}
+
+			Section(header: Text("Statistics")) {
+				HStack {
+					Text("URLs Cleaned: \(cleanedCount)")
+					Spacer()
+					Button("Reset") {
+						cleanedCount = 0
+					}
 				}
 			}
 		}
