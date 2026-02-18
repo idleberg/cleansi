@@ -26,6 +26,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		setupStatusItem()
 		setupClipboardMonitor()
 		observeCleanedCount()
+		if notificationsEnabled {
+			requestNotificationAuthorization()
+		}
+	}
+
+	private func requestNotificationAuthorization() {
+		UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { _, _ in }
 	}
 
 	private var cleanedCountObserver: NSObjectProtocol?
@@ -139,22 +146,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private func sendNotification(serviceName: String) {
 		guard notificationsEnabled else { return }
 
-		let center = UNUserNotificationCenter.current()
-		center.requestAuthorization(options: [.alert]) { granted, _ in
-			guard granted else { return }
+		let content = UNMutableNotificationContent()
+		content.title = "URL Cleaned"
+		content.body = "\(serviceName) URL has been cleaned"
 
-			let content = UNMutableNotificationContent()
-			content.title = "URL Cleaned"
-			content.body = "\(serviceName) URL has been cleaned"
+		let request = UNNotificationRequest(
+			identifier: UUID().uuidString,
+			content: content,
+			trigger: nil
+		)
 
-			let request = UNNotificationRequest(
-				identifier: UUID().uuidString,
-				content: content,
-				trigger: nil
-			)
-
-			center.add(request)
-		}
+		UNUserNotificationCenter.current().add(request)
 	}
 
 	@objc private func toggleMonitoring() {

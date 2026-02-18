@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 struct ServiceToggleRow: View {
 	let service: Service
@@ -60,6 +61,11 @@ struct PreferencesView: View {
 					description: "Show a notification when a URL has been cleaned.",
 					isOn: $notificationsEnabled
 				)
+				.onChange(of: notificationsEnabled) { enabled in
+					if enabled {
+						UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { _, _ in }
+					}
+				}
 			}
 
 			Section(header: Text("Services")) {
