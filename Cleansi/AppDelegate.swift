@@ -172,27 +172,36 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		}
 	}
 
+	private func makeWindow<Content: View>(title: String, content: Content) -> NSWindow {
+		let hostingView = NSHostingView(rootView: content)
+		hostingView.setFrameSize(hostingView.fittingSize)
+
+		let window = NSWindow(
+			contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
+			styleMask: [.titled, .closable],
+			backing: .buffered,
+			defer: false
+		)
+		window.title = title
+		window.contentView = hostingView
+		window.center()
+		window.isReleasedWhenClosed = false
+		window.delegate = self
+		return window
+	}
+
+	private func showWindow(_ window: NSWindow) {
+		NSApp.setActivationPolicy(.regular)
+		window.makeKeyAndOrderFront(nil)
+		NSApp.activate(ignoringOtherApps: true)
+	}
+
 	@objc private func showPreferences() {
 		if preferencesWindow == nil {
-			let hostingView = NSHostingView(rootView: PreferencesView())
-			hostingView.setFrameSize(hostingView.fittingSize)
-
-			preferencesWindow = NSWindow(
-				contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
-				styleMask: [.titled, .closable],
-				backing: .buffered,
-				defer: false
-			)
-			preferencesWindow?.title = "\(Self.appName) Preferences"
-			preferencesWindow?.contentView = hostingView
-			preferencesWindow?.center()
-			preferencesWindow?.isReleasedWhenClosed = false
-			preferencesWindow?.delegate = self
+			preferencesWindow = makeWindow(
+				title: "\(Self.appName) Preferences", content: PreferencesView())
 		}
-
-		NSApp.setActivationPolicy(.regular)
-		preferencesWindow?.makeKeyAndOrderFront(nil)
-		NSApp.activate(ignoringOtherApps: true)
+		showWindow(preferencesWindow!)
 	}
 
 	func windowWillClose(_ notification: Notification) {
@@ -204,28 +213,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 	@objc private func showAbout() {
 		if aboutWindow == nil {
-			let aboutView = AboutView()
-			let hostingView = NSHostingView(rootView: aboutView)
-			hostingView.setFrameSize(hostingView.fittingSize)
-
-			aboutWindow = NSWindow(
-				contentRect: NSRect(origin: .zero, size: hostingView.fittingSize),
-				styleMask: [.titled, .closable],
-				backing: .buffered,
-				defer: false
-			)
-			aboutWindow?.title = "About"
-			aboutWindow?.contentView = hostingView
-			aboutWindow?.center()
-			aboutWindow?.isReleasedWhenClosed = false
-			aboutWindow?.delegate = self
+			aboutWindow = makeWindow(title: "About", content: AboutView())
 			aboutWindow?.initialFirstResponder = nil
 		}
-
-		NSApp.setActivationPolicy(.regular)
-		aboutWindow?.makeKeyAndOrderFront(nil)
+		showWindow(aboutWindow!)
 		aboutWindow?.makeFirstResponder(nil)
-		NSApp.activate(ignoringOtherApps: true)
 	}
 
 	@objc private func quitApp() {
