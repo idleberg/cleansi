@@ -4,6 +4,9 @@ import UserNotifications
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	private static let appName = "Cleansi"
+	private static let settingsLabel: String = {
+		if #available(macOS 13, *) { return "Settings…" } else { return "Preferences…" }
+	}()
 
 	private var statusItem: NSStatusItem!
 	private var clipboardMonitor: ClipboardMonitor!
@@ -89,7 +92,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
 		// Preferences
 		let preferencesItem = NSMenuItem(
-			title: "Preferences...",
+			title: Self.settingsLabel,
 			action: #selector(showPreferences),
 			keyEquivalent: ","
 		)
@@ -199,7 +202,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 	@objc private func showPreferences() {
 		if preferencesWindow == nil {
 			preferencesWindow = makeWindow(
-				title: "\(Self.appName) Preferences", content: PreferencesView())
+				title: "\(Self.appName) \(Self.settingsLabel)", content: PreferencesView())
 		}
 		showWindow(preferencesWindow!)
 	}
