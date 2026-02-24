@@ -8,7 +8,11 @@ build:
 		-configuration Release \
 		-derivedDataPath build
 
-lint:
+fix-lint:
 	swiftlint lint \
 		--strict \
 		--fix
+
+lint:
+	swiftlint lint \
+		--strict
