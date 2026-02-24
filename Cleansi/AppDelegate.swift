@@ -124,10 +124,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 			isEnabled: { [weak self] in self?.monitoringEnabled ?? false },
 			serviceEnabled: { [weak self] serviceId in self?.isServiceEnabled(serviceId) ?? false },
 			cleanUrlsInText: { [weak self] in self?.cleanUrlsInText ?? false },
-			onClean: { [weak self] (serviceName: String) in
+			onClean: { [weak self] (serviceName: String, wasText: Bool) in
 				self?.updateMenu()
 				self?.showIconFeedback()
-				self?.sendNotification(serviceName: serviceName)
+				self?.sendNotification(serviceName: serviceName, wasText: wasText)
 			}
 		)
 		clipboardMonitor.startMonitoring()
@@ -146,12 +146,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 		}
 	}
 
-	private func sendNotification(serviceName: String) {
+	private func sendNotification(serviceName: String, wasText: Bool) {
 		guard notificationsEnabled else { return }
 
 		let content = UNMutableNotificationContent()
-		content.title = "URL Cleaned"
-		content.body = "\(serviceName) URL has been cleaned"
+		content.title = wasText ? "Text Cleaned" : "URL Cleaned"
+		content.body =
+			wasText
+			? "Cleaned \(serviceName) URL in text"
+			: "\(serviceName) URL has been cleaned"
 
 		let request = UNNotificationRequest(
 			identifier: UUID().uuidString,

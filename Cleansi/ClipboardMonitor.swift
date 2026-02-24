@@ -41,7 +41,7 @@ class ClipboardMonitor {
 	private let isEnabled: () -> Bool
 	private let serviceEnabled: (String) -> Bool
 	private let cleanUrlsInText: () -> Bool
-	private let onClean: (String) -> Void
+	private let onClean: (_ serviceName: String, _ wasText: Bool) -> Void
 
 	// UTM params defined once - used by "utm" service and can be referenced elsewhere
 	static let utmParams: Set<String> = [
@@ -109,7 +109,7 @@ class ClipboardMonitor {
 		isEnabled: @escaping () -> Bool,
 		serviceEnabled: @escaping (String) -> Bool,
 		cleanUrlsInText: @escaping () -> Bool,
-		onClean: @escaping (String) -> Void
+		onClean: @escaping (_ serviceName: String, _ wasText: Bool) -> Void
 	) {
 		self.isEnabled = isEnabled
 		self.serviceEnabled = serviceEnabled
@@ -142,11 +142,9 @@ class ClipboardMonitor {
 		let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
 
 		// In single-URL mode, only clean if entire content is a URL
+		let isStandaloneURL = URL(string: trimmedContent).map { $0.scheme != nil && $0.host != nil } ?? false
 		if !cleanUrlsInText() {
-			guard let url = URL(string: trimmedContent),
-				url.scheme != nil,
-				url.host != nil
-			else { return }
+			guard isStandaloneURL else { return }
 		}
 
 		let (cleanedContent, serviceName) = cleanURLs(in: content)
@@ -157,7 +155,7 @@ class ClipboardMonitor {
 			lastChangeCount = pasteboard.changeCount
 
 			ClipboardMonitor.cleanedCount += 1
-			onClean(serviceName)
+			onClean(serviceName, !isStandaloneURL)
 		}
 	}
 
