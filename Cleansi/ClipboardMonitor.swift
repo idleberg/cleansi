@@ -131,11 +131,11 @@ class ClipboardMonitor {
 	}
 
 	private func checkClipboard() {
-		guard isEnabled() else { return }
-
 		let currentChangeCount = pasteboard.changeCount
 		guard currentChangeCount != lastChangeCount else { return }
 		lastChangeCount = currentChangeCount
+
+		guard isEnabled() else { return }
 
 		guard let content = pasteboard.string(forType: .string) else { return }
 
