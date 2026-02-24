@@ -9,3 +9,6 @@ build:
 		-derivedDataPath build
 
 lint:
+	swiftlint lint \
+		--strict \
+		--fix
