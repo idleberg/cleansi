@@ -7,3 +7,5 @@ build:
 	xcodebuild -scheme Cleansi \
 		-configuration Release \
 		-derivedDataPath build
+
+lint:
