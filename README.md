@@ -2,9 +2,11 @@
 
 > [!IMPORTANT]
 >
-> This project is 100% vibe-coded. There are probably a million *more professional* alternatives, but personally, I think the contents of the clipboard isn't something to share with a random app. Cleansi works great for my personal needs!
+> This project is 100% vibe-coded. There are probably a million alternatives to this tool, but personally, I think the contents of the clipboard is too private to share it with any random app. Cleansi works great for my personal needs!
 
 A lightweight macOS menu bar application that automatically removes tracking parameters from URLs when you copy them to your clipboard. Supports YouTube, Spotify, Instagram, Amazon, and universal filters for Facebook Click IDs and Google Analytics UTM parameters.
+
+Supports macOS 13 or later.
 
 ## Features
 
