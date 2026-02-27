@@ -32,23 +32,23 @@ brew install idleberg/asahi/cleansi
 
 | Original URL                                                      | Cleaned URL                               |
 | ----------------------------------------------------------------- | ----------------------------------------- |
-| `https://youtu.be/dQw4w9WgXcQ                          | `https://youtu.be/dQw4w9WgXcQ`            |
-| `https://youtube.com/watch?v=dQw4w9WgXcQ | `https://youtube.com/watch?v=dQw4w9WgXcQ` |
-| `https://youtube.com/shorts/abc123                     | `https://youtube.com/shorts/abc123`       |
+| `https://youtu.be/dQw4w9WgXcQ?si=abc123`                          | `https://youtu.be/dQw4w9WgXcQ`            |
+| `https://youtube.com/watch?v=dQw4w9WgXcQ&si=abc123&feature=share` | `https://youtube.com/watch?v=dQw4w9WgXcQ` |
+| `https://youtube.com/shorts/abc123?si=xyz789`                     | `https://youtube.com/shorts/abc123`       |
 
 ### Spotify
 
 | Original URL                                                    | Cleaned URL                               |
 | --------------------------------------------------------------- | ----------------------------------------- |
-| `https://open.spotify.com/track/abc123               | `https://open.spotify.com/track/abc123`   |
-| `https://open.spotify.com/playlist/xyz | `https://open.spotify.com/playlist/xyz`   |
+| `https://open.spotify.com/track/abc123?si=def456`               | `https://open.spotify.com/track/abc123`   |
+| `https://open.spotify.com/playlist/xyz?si=abc&nd=1&context=def` | `https://open.spotify.com/playlist/xyz`   |
 
 ### Instagram
 
 | Original URL                                  | Cleaned URL                          |
 | --------------------------------------------- | ------------------------------------ |
-| `https://instagram.com/p/abc123/ | `https://instagram.com/p/abc123/`    |
-| `https://instagram.com/reel/abc123/ | `https://instagram.com/reel/abc123/` |
+| `https://instagram.com/p/abc123/?igsh=xyz789` | `https://instagram.com/p/abc123/`    |
+| `https://instagram.com/reel/abc123/?igsh=xyz` | `https://instagram.com/reel/abc123/` |
 
 ### Amazon
 
@@ -56,8 +56,8 @@ Removes **all** query parameters from Amazon product URLs. Supports all internat
 
 | Original URL                                                           | Cleaned URL                                    |
 | ---------------------------------------------------------------------- | ---------------------------------------------- |
-| `https://amazon.com/dp/B08N5WRWNW                     | `https://amazon.com/dp/B08N5WRWNW`             |
-| `https://amazon.de/gp/product/B08N5WRWNW     | `https://amazon.de/gp/product/B08N5WRWNW`      |
+| `https://amazon.com/dp/B08N5WRWNW?ref=abc&tag=xyz`                     | `https://amazon.com/dp/B08N5WRWNW`             |
+| `https://amazon.de/gp/product/B08N5WRWNW?pf_rd_p=abc&linkCode=xyz`     | `https://amazon.de/gp/product/B08N5WRWNW`      |
 
 ### Facebook Click ID (Universal)
 
@@ -65,8 +65,8 @@ Removes `fbclid` parameter from **any URL**. Can be combined with service-specif
 
 | Original URL                                              | Cleaned URL                          |
 | --------------------------------------------------------- | ------------------------------------ |
-| `https://example.com/page                  | `https://example.com/page`           |
-| `https://open.spotify.com/track/abc    | `https://open.spotify.com/track/abc` |
+| `https://example.com/page?fbclid=abc123`                  | `https://example.com/page`           |
+| `https://open.spotify.com/track/abc?si=def&fbclid=xyz`    | `https://open.spotify.com/track/abc` |
 
 ### Google Analytics UTM (Universal)
 
@@ -74,8 +74,9 @@ Removes UTM tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`, `ut
 
 | Original URL                                                       | Cleaned URL                          |
 | ------------------------------------------------------------------ | ------------------------------------ |
-| `https://example.com/page    | `https://example.com/page`           |
-| `https://youtu.be/abc                  | `https://youtu.be/abc`               |
+| `https://example.com/page?utm_source=twitter&utm_medium=social`    | `https://example.com/page`           |
+| `https://youtu.be/abc?si=def&utm_campaign=summer`                  | `https://youtu.be/abc`               |
+
 
 ## Building from Source
 
