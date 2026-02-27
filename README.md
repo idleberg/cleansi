@@ -90,4 +90,4 @@ Want to build your own version or contribute? See the [Developer Documentation](
 
 ## License
 
-MIT License - Feel free to use, modify, and distribute this code.
+[The MIT License](LICENSE) - Feel free to use, modify, and distribute this code.
