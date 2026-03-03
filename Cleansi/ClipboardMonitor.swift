@@ -43,11 +43,6 @@ class ClipboardMonitor {
 	private let cleanUrlsInText: () -> Bool
 	private let onClean: (_ serviceName: String, _ wasText: Bool) -> Void
 
-	// UTM params defined once - used by "utm" service and can be referenced elsewhere
-	static let utmParams: Set<String> = [
-		"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
-	]
-
 	// All services defined in one place with full metadata
 	static let services: [Service] = [
 		Service(
@@ -75,7 +70,9 @@ class ClipboardMonitor {
 			name: "Google Analytics",
 			description: "Removes UTM tracking parameters from any URL.",
 			hosts: [],  // Empty hosts means it matches any URL as fallback
-			trackingParams: utmParams
+			trackingParams: [
+				"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
+			]
 		),
 		Service(
 			id: "instagram",
@@ -83,6 +80,13 @@ class ClipboardMonitor {
 			description: "Removes tracking parameters from post, reel, and story URLs.",
 			hosts: ["instagram.com"],
 			trackingParams: ["igsh", "igshid"]
+		),
+		Service(
+			id: "ref",
+			name: "Referral Tracking",
+			description: "Removes referral tracking parameters from any URL.",
+			hosts: [],
+			trackingParams: ["ref", "ref_src", "ref_url", "ref_type"]
 		),
 		Service(
 			id: "spotify",
@@ -142,7 +146,8 @@ class ClipboardMonitor {
 		let trimmedContent = content.trimmingCharacters(in: .whitespacesAndNewlines)
 
 		// In single-URL mode, only clean if entire content is a URL
-		let isStandaloneURL = URL(string: trimmedContent).map { $0.scheme != nil && $0.host != nil } ?? false
+		let isStandaloneURL =
+			URL(string: trimmedContent).map { $0.scheme != nil && $0.host != nil } ?? false
 		if !cleanUrlsInText() {
 			guard isStandaloneURL else { return }
 		}
