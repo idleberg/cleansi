@@ -4,7 +4,7 @@
 >
 > This project is 100% vibe-coded. There are probably a million alternatives to this tool, but personally, I think the contents of the clipboard is too private to share it with any random app. Cleansi works great for my personal needs!
 
-A lightweight macOS menu bar application that automatically removes tracking parameters from URLs when you copy them to your clipboard. Supports YouTube, Spotify, Instagram, Amazon, and universal filters for Facebook Click IDs and Google Analytics UTM parameters.
+A lightweight macOS menu bar application that automatically removes tracking parameters from URLs when you copy them to your clipboard. Supports YouTube, Spotify, Instagram, Amazon, and universal filters for Facebook Click IDs, Google Analytics UTM parameters, and referral tracking parameters.
 
 Supports macOS 13 or later.
 
@@ -76,6 +76,15 @@ Removes UTM tracking parameters (`utm_source`, `utm_medium`, `utm_campaign`, `ut
 | ------------------------------------------------------------------ | ------------------------------------ |
 | `https://example.com/page?utm_source=twitter&utm_medium=social`    | `https://example.com/page`           |
 | `https://youtu.be/abc?si=def&utm_campaign=summer`                  | `https://youtu.be/abc`               |
+
+### Referral Tracking (Universal)
+
+Removes referral tracking parameters (`ref`, `ref_src`, `ref_url`, `ref_type`) from **any URL**. Can be combined with service-specific filters.
+
+| Original URL                                                       | Cleaned URL                          |
+| ------------------------------------------------------------------ | ------------------------------------ |
+| `https://example.com/page?ref=homepage`                            | `https://example.com/page`           |
+| `https://example.com/article?ref_src=twitter&ref_type=share`       | `https://example.com/article`        |
 
 
 ## Building from Source
