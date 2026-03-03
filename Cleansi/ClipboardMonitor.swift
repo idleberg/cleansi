@@ -54,7 +54,7 @@ class ClipboardMonitor {
 				"amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.it", "amazon.es",
 				"amazon.ca", "amazon.com.au", "amazon.co.jp", "amazon.in", "amazon.com.br",
 				"amazon.com.mx", "amazon.nl", "amazon.pl", "amazon.se", "amazon.sg",
-				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn"
+				"amazon.ae", "amazon.sa", "amazon.com.tr", "amazon.eg", "amazon.com.be", "amazon.cn",
 			],
 			removeAllParams: true
 		),
@@ -71,7 +71,7 @@ class ClipboardMonitor {
 			description: "Removes UTM tracking parameters from any URL.",
 			hosts: [],  // Empty hosts means it matches any URL as fallback
 			trackingParams: [
-				"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id"
+				"utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "utm_id",
 			]
 		),
 		Service(
@@ -83,7 +83,7 @@ class ClipboardMonitor {
 		),
 		Service(
 			id: "ref",
-			name: "Referral Tracking",
+			name: "Referrals",
 			description: "Removes referral tracking parameters from any URL.",
 			hosts: [],
 			trackingParams: ["ref", "ref_src", "ref_url", "ref_type"]
@@ -101,7 +101,7 @@ class ClipboardMonitor {
 			description: "Removes tracking parameters from video, shorts, and playlist URLs.",
 			hosts: ["youtube.com", "youtu.be"],
 			trackingParams: ["si", "feature", "app", "pp"]
-		)
+		),
 	]
 
 	static var cleanedCount: Int {
@@ -220,7 +220,8 @@ class ClipboardMonitor {
 	}
 
 	private func cleanURL(_ url: URL, removing paramsToRemove: Set<String>, removeAll: Bool = false)
-		-> String? {
+		-> String?
+	{
 		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
 			return nil
 		}
