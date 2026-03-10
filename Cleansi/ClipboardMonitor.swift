@@ -199,9 +199,13 @@ class ClipboardMonitor {
 
 			// Combine with fallback services (like UTM) unless removeAllParams is set
 			if !removeAllParams {
+				let urlParamNames = Set(
+					URLComponents(url: url, resolvingAgainstBaseURL: false)?
+						.queryItems?.map { $0.name.lowercased() } ?? [])
 				for service in fallbackServices where serviceEnabled(service.id) {
 					paramsToRemove.formUnion(service.trackingParams)
-					if matchedServiceName == nil {
+					if matchedServiceName == nil
+						&& !service.trackingParams.isDisjoint(with: urlParamNames) {
 						matchedServiceName = service.name
 					}
 				}
