@@ -282,7 +282,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = development;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.Cleansi;
+				PRODUCT_BUNDLE_IDENTIFIER = com.idleberg.Cleansi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -308,7 +308,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = development;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.Cleansi;
+				PRODUCT_BUNDLE_IDENTIFIER = com.idleberg.Cleansi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
