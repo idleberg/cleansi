@@ -10,7 +10,6 @@ build:
 
 fix-lint:
 	swiftlint lint \
-		--strict \
 		--fix
 
 lint:
